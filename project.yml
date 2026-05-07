@@ -1,0 +1,70 @@
+# JiraJump - xcodegen 프로젝트 정의
+# 이 파일이 Xcode 프로젝트의 단일 소스. .xcodeproj는 자동 생성물이며 git에서는 무시.
+
+name: JiraJump
+
+options:
+  bundleIdPrefix: com.jirajump
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+configs:
+  Debug: debug
+  Release: release
+
+# 글로벌 핫키 등록은 Sindre Sorhus의 KeyboardShortcuts 라이브러리 사용.
+# 사용자 커스터마이즈 + UserDefaults 영속화를 라이브러리가 처리.
+packages:
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: "2.0.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    # 로컬 개발용 ad-hoc 서명. 팀 ID 없이 빌드/실행 가능.
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: NO
+
+targets:
+  JiraJump:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: JiraJump
+    dependencies:
+      - package: KeyboardShortcuts
+    settings:
+      base:
+        PRODUCT_NAME: JiraJump
+        PRODUCT_BUNDLE_IDENTIFIER: com.jirajump.JiraJump
+        # 표준 Info.plist 버전 빌드 설정 → CFBundleShortVersionString / CFBundleVersion.
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        # Info.plist는 빌드 설정에서 자동 생성 (INFOPLIST_KEY_* 사용).
+        GENERATE_INFOPLIST_FILE: YES
+        # LSUIElement=YES → Dock 아이콘 숨김. 메뉴바 전용 앱.
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_CFBundleDisplayName: JiraJump
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 JiraJump"
+        # 화면 캡처 권한 안내 문구. Step 7에서 사용.
+        INFOPLIST_KEY_NSScreenCaptureUsageDescription: "JiraJump가 선택한 영역을 캡처하여 Jira 이슈 키를 인식합니다."
+
+  JiraJumpTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: JiraJumpTests
+    dependencies:
+      - target: JiraJump
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jirajump.JiraJumpTests
+        GENERATE_INFOPLIST_FILE: YES
